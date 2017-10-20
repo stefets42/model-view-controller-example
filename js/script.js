@@ -57,11 +57,6 @@ var catListView = {
     },
     
     render: function() {
-        var currentCat = controller.getCurrentCat();
-        this.catCountElement.textContent = currentCat.clickCount;
-        this.catNameElement.textContent = "Click on " + currentCat.name + " to increase its counter";
-        this.catImageElement.src = currentCat.imgSrc;
-
         var cat, element, i;
         var cats = controller.getCats();
         this.catListElement.innerHTML = '';
@@ -114,6 +109,7 @@ var adminView = {
     },
     
     show: function(){
+            this.render();
             admin.style.display = 'block';
         },
         
@@ -126,11 +122,13 @@ var adminView = {
 /* ======= Controller ======= */
 var controller = {
     init: function() {
-        cat.currentCat = cat.cats[0];
+        this.cats = controller.getCats();
+        
+        cat.currentCat = this.cats[0];
         catListView.init();
         catDisplayView.init();
-        adminView.init;
-        adminView.hide;
+        adminView.init();
+        adminView.hide();
     },
     
     getCurrentCat: function() { 
@@ -150,24 +148,30 @@ var controller = {
         catDisplayView.render();
     },
 
-    adminDisplay: function(){
-    if (cat.adminShow == false) {
-        cat.adminShow = true;
-        adminView.show();
-    }
-    else if (cat.adminShow == true) {
-        cat.adminShow = false;
+    adminDisplay: function() {
+        if (cat.adminShow == false) {
+            cat.adminShow = true;
+            adminView.show();
+        }
+        else if (cat.adminShow == true) {
+            cat.adminShow = false;
+            adminView.hide();
+        }
+    },
+    
+    adminCancel: function() {
         adminView.hide();
     },
     
-    adminCancel: function(){
-        adminView.hide();
-    },
-    
-    adminSave: function(){
-        cat.currentCat.name= adminCatName.value;
-        cat.currentCat.imgSrc= adminCatURL.value;
-        cat.currentCat.clickCount= adminCatClicks.value;
+    adminSave: function() {
+        var new_cat = { 
+            name: adminCatName.value,
+            imgSrc: adminCatURL.value,
+            clickCount: adminCatClicks.value,
+        };
+        this.cats.push(new_cat);
+        controller.setCurrentCat(new_cat);
+
         catDisplayView.render();
         catListView.render();
         adminView.hide();
